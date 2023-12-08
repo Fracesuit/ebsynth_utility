@@ -12,8 +12,8 @@ def on_ui_tabs():
                 with gr.Row():
                     with gr.Tabs(elem_id="ebs_settings"):
                         with gr.TabItem('project setting', elem_id='ebs_project_setting'):
-                            project_dir = gr.Textbox(label='Project directory', lines=1, value="C:\ebsynth\video")
-                            original_movie_path = gr.Textbox(label='Original Movie Path', lines=1, value="C:\ebsynth\video\m.mp4")
+                            project_dir = gr.Textbox(label='Project directory', lines=1, value="C:\\ebsynth\\video")
+                            original_movie_path = gr.Textbox(label='Original Movie Path', lines=1, value="C:\\ebsynth\\video\\m.mp4")
 
                             org_video = gr.Video(interactive=True, mirror_webcam=False)
 
