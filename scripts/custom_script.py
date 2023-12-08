@@ -96,7 +96,7 @@ class Script(scripts.Script):
     def ui(self, is_img2img):
         with gr.Column(variant='panel'):
             with gr.Column():
-                project_dir = gr.Textbox(label='Project directory', lines=1, value="C:\ebsynth\video")
+                project_dir = gr.Textbox(label='Project directory', lines=1, value="C:\\ebsynth\\video")
                 generation_test = gr.Checkbox(False, label="Generation TEST!!(Ignore Project directory and use the image and mask specified in the main UI)")
 
             with gr.Accordion("Mask option"):
