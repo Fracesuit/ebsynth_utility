@@ -10,6 +10,7 @@ from transparent_background import Remover
 from tqdm.auto import tqdm
 import torch
 import numpy as np
+from extensions.ebsynth_utility.stage2 import ebsynth_utility_stage2
 
 
 def resize_img(img, w, h):
@@ -164,7 +165,7 @@ def create_mask_transparent_background(input_dir, output_dir, tb_use_fast_mode, 
         cv2.imwrite(os.path.join(output_dir, base_name), out)
 
 
-def ebsynth_utility_stage1(dbg, project_args, frame_width, frame_height, st1_masking_method_index, st1_mask_threshold, tb_use_fast_mode, tb_use_jit, clipseg_mask_prompt, clipseg_exclude_prompt, clipseg_mask_threshold, clipseg_mask_blur_size, clipseg_mask_blur_size2, is_invert_mask):
+def ebsynth_utility_stage1(dbg, project_args, frame_width, frame_height, st1_masking_method_index, st1_mask_threshold, tb_use_fast_mode, tb_use_jit, clipseg_mask_prompt, clipseg_exclude_prompt, clipseg_mask_threshold, clipseg_mask_blur_size, clipseg_mask_blur_size2, is_invert_mask, key_min_gap, key_max_gap, key_th, key_add_last_frame):
     dbg.print("stage1")
     dbg.print("")
 
@@ -172,8 +173,7 @@ def ebsynth_utility_stage1(dbg, project_args, frame_width, frame_height, st1_mas
         dbg.print("Error: clipseg_mask_prompt is Empty")
         return
 
-    project_dir, original_movie_path, frame_path, frame_mask_path, _, _, _ = project_args
-
+    project_dir, original_movie_path, frame_path, frame_mask_path, org_key_path, _, _ = project_args
     if is_invert_mask:
         if os.path.isdir( frame_path ) and os.path.isdir( frame_mask_path ):
             dbg.print("Skip as it appears that the frame and normal masks have already been generated.")
@@ -204,17 +204,19 @@ def ebsynth_utility_stage1(dbg, project_args, frame_width, frame_height, st1_mas
         if frame_width != -1 or frame_height != -1:
             resize_all_img(frame_path, frame_width, frame_height)
 
+    ebsynth_utility_stage2(dbg, project_args, key_min_gap, key_max_gap, key_th, key_add_last_frame, is_invert_mask)
+
     if frame_mask_path:
         if st1_masking_method_index == 0:
-            create_mask_transparent_background(frame_path, frame_mask_path, tb_use_fast_mode, tb_use_jit, st1_mask_threshold)
+            create_mask_transparent_background(org_key_path, frame_mask_path, tb_use_fast_mode, tb_use_jit, st1_mask_threshold)
         elif st1_masking_method_index == 1:
-            create_mask_clipseg(frame_path, frame_mask_path, clipseg_mask_prompt, clipseg_exclude_prompt, clipseg_mask_threshold, clipseg_mask_blur_size, clipseg_mask_blur_size2)
+            create_mask_clipseg(org_key_path, frame_mask_path, clipseg_mask_prompt, clipseg_exclude_prompt, clipseg_mask_threshold, clipseg_mask_blur_size, clipseg_mask_blur_size2)
         elif st1_masking_method_index == 2:
             tb_tmp_path = os.path.join(project_dir , "tb_mask_tmp")
             if not os.path.isdir( tb_tmp_path ):
                 os.makedirs(tb_tmp_path, exist_ok=True)
-                create_mask_transparent_background(frame_path, tb_tmp_path, tb_use_fast_mode, tb_use_jit, st1_mask_threshold)
-            create_mask_clipseg(frame_path, frame_mask_path, clipseg_mask_prompt, clipseg_exclude_prompt, clipseg_mask_threshold, clipseg_mask_blur_size, clipseg_mask_blur_size2)
+                create_mask_transparent_background(org_key_path, tb_tmp_path, tb_use_fast_mode, tb_use_jit, st1_mask_threshold)
+            create_mask_clipseg(org_key_path, frame_mask_path, clipseg_mask_prompt, clipseg_exclude_prompt, clipseg_mask_threshold, clipseg_mask_blur_size, clipseg_mask_blur_size2)
             create_and_mask(tb_tmp_path,frame_mask_path,frame_mask_path)
 
 

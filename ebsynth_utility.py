@@ -12,6 +12,12 @@ from extensions.ebsynth_utility.stage5 import ebsynth_utility_stage5
 from extensions.ebsynth_utility.stage7 import ebsynth_utility_stage7
 from extensions.ebsynth_utility.stage8 import ebsynth_utility_stage8
 from extensions.ebsynth_utility.stage3_5 import ebsynth_utility_stage3_5
+import subprocess
+
+bat_file_path = "C:\ebsynth\Ebsynth_auto_run\RunMe.bat"
+#command="python D:/GITHUB/ai/sd/Ebsynth_auto_run//gui_app.py"
+#exe_file_path = "D:/GITHUB/ai/sd/Ebsynth_auto_run/ebsynth_auto_run_app.exe"
+
 
 
 def x_ceiling(value, step):
@@ -76,7 +82,7 @@ def ebsynth_utility_process(stage_index: int, project_dir:str, original_movie_pa
 
 
     if stage_index == 0:
-        ebsynth_utility_stage1(dbg, project_args, frame_width, frame_height, st1_masking_method_index, st1_mask_threshold, tb_use_fast_mode, tb_use_jit, clipseg_mask_prompt, clipseg_exclude_prompt, clipseg_mask_threshold, clipseg_mask_blur_size, clipseg_mask_blur_size2, is_invert_mask)
+        ebsynth_utility_stage1(dbg, project_args, frame_width, frame_height, st1_masking_method_index, st1_mask_threshold, tb_use_fast_mode, tb_use_jit, clipseg_mask_prompt, clipseg_exclude_prompt, clipseg_mask_threshold, clipseg_mask_blur_size, clipseg_mask_blur_size2, is_invert_mask,key_min_gap, key_max_gap, key_th, key_add_last_frame,)
         if is_invert_mask:
             inv_mask_path = os.path.join(inv_path, "inv_video_mask")
             ebsynth_utility_stage1_invert(dbg, frame_mask_path, inv_mask_path)
@@ -155,12 +161,13 @@ def ebsynth_utility_process(stage_index: int, project_dir:str, original_movie_pa
         return process_end( dbg, "" )
     elif stage_index == 5:
         ebsynth_utility_stage5(dbg, project_args, is_invert_mask)
+        # 处理ebs
+        subprocess.Popen(bat_file_path, shell=True)
     elif stage_index == 6:
-
         if is_invert_mask:
             project_dir = inv_path
 
-        dbg.print("stage 6")
+        dbg.print("stage 6 zzr")
         dbg.print("")
         dbg.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         dbg.print("Running ebsynth.(on your self)")
